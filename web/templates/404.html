@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}404 - 新闻推荐系统{% endblock %}
+{% block content %}
+<div class="card" style="text-align:center; padding:60px 24px;">
+    <div style="font-size:64px; color:#c62828;">404</div>
+    <p style="font-size:18px; margin:16px 0;">新闻 #{{ news_id }} 不存在</p>
+    <p style="color:#999; margin-bottom:24px;">可能已被删除，或链接有误</p>
+    <a href="/" style="display:inline-block; background:#c62828; color:#fff; padding:10px 28px; border-radius:4px;">返回首页</a>
+</div>
+{% endblock %}

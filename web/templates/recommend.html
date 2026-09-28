@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}个性化推荐 - 新闻推荐系统{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="page-title">🔍 搜索推荐</div>
+    <form class="search-box" action="/search" method="get">
+        <input type="text" name="q" placeholder="输入关键词，如：人工智能 芯片" value="{{ request.args.get('q', '') }}">
+        <button type="submit">搜索</button>
+    </form>
+</div>
+
+{% if history_news %}
+<div class="card">
+    <div class="page-title" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>📖 我的浏览历史（最近 {{ history_count }} 条）</span>
+        <form action="/clear_history" method="post" style="margin:0;">
+            <button type="submit" class="btn-danger">清空历史</button>
+        </form>
+    </div>
+    {% for n in history_news %}
+    <div class="news-item">
+        <a class="title" href="/news/{{ n.id }}">{{ n.title }}</a>
+        <div class="meta"><span class="tag">{{ n.category }}</span></div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="page-title">🎯 为你推荐</div>
+    {% if items %}
+        {% for n in items %}
+        <div class="news-item">
+            <a class="title" href="/news/{{ n.id }}">{{ n.title }}</a>
+            <div class="meta">
+                <span class="tag">{{ n.category }}</span>
+                {% if n.score is defined %}<span class="score">相似度 {{ "%.3f"|format(n.score) }}</span>{% endif %}
+                {% if n.publish_time %} ｜ {{ n.publish_time }}{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty">
+            {% if history_count %}
+                暂无推荐结果，请先浏览更多新闻。
+            {% else %}
+                你还没有浏览任何新闻，先去<a href="/" style="color:#c62828;">首页</a>看看吧！
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

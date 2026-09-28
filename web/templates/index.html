@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} - 新闻推荐系统{% endblock %}
+{% block content %}
+<div class="stats-bar">
+    <span class="stat-total">共 {{ total }} 条新闻</span>
+    {% for s in stats %}
+    <a class="stat-chip {{ 'active' if active == s.category else '' }}" href="/category/{{ s.category }}">{{ s.category }} {{ s.count }}</a>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <div class="page-title">{{ page_title }}</div>
+    {% if news %}
+        {% for n in news %}
+        <div class="news-item">
+            <a class="title" href="/news/{{ n.id }}">{{ n.title }}</a>
+            {% if n.summary %}<p class="summary">{{ n.summary }}…</p>{% endif %}
+            <div class="meta">
+                <span class="tag">{{ n.category }}</span>
+                {% if n.publish_time %}发布时间：{{ n.publish_time }}{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if pages > 1 %}
+        <div class="pagination">
+            {% if page > 1 %}<a href="{{ base_url }}?page={{ page - 1 }}">← 上一页</a>{% endif %}
+            <span>第 {{ page }} / {{ pages }} 页</span>
+            {% if page < pages %}<a href="{{ base_url }}?page={{ page + 1 }}">下一页 →</a>{% endif %}
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="empty">暂无新闻数据，请先运行爬虫：python -m crawler.spider</div>
+    {% endif %}
+</div>
+{% endblock %}

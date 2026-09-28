@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# 模型训练产物（可重新训练生成：python -m models.train）
+models/saved/*.pkl
+models/saved/*.png
+models/saved/*.txt
+models/saved/
+
+# 导出的 CSV（可由数据库重新导出：python -m crawler.clean --export）
+data/news.csv
+
+# 日志
+*.log

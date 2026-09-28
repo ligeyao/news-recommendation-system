@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}新闻推荐系统{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f4f5f7; color: #333; }
+        a { text-decoration: none; color: inherit; }
+        .navbar { background: #c62828; color: #fff; padding: 0 24px; display: flex; align-items: center; height: 56px; box-shadow: 0 2px 4px rgba(0,0,0,.2); }
+        .navbar .brand { font-size: 20px; font-weight: bold; margin-right: 32px; color: #fff; }
+        .navbar nav { display: flex; gap: 4px; flex-wrap: wrap; }
+        .navbar nav a { color: #ffd7d7; padding: 6px 12px; border-radius: 4px; font-size: 14px; }
+        .navbar nav a:hover, .navbar nav a.active { background: rgba(255,255,255,.15); color: #fff; }
+        .container { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
+        .card { background: #fff; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+        .page-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; color: #c62828; }
+        .news-item { padding: 12px 0; border-bottom: 1px solid #eee; }
+        .news-item:last-child { border-bottom: none; }
+        .news-item a.title { font-size: 16px; color: #222; font-weight: 500; line-height: 1.5; }
+        .news-item a.title:hover { color: #c62828; }
+        .news-item .meta { font-size: 12px; color: #999; margin-top: 4px; }
+        .tag { display: inline-block; background: #fdecea; color: #c62828; font-size: 12px; padding: 2px 8px; border-radius: 3px; margin-right: 8px; }
+        .score { color: #e65100; font-weight: bold; font-size: 13px; }
+        .empty { color: #999; text-align: center; padding: 30px 0; }
+        .content-text { line-height: 1.9; font-size: 15px; white-space: pre-wrap; }
+        .section-title { font-size: 16px; font-weight: bold; margin: 16px 0 8px; padding-left: 8px; border-left: 4px solid #c62828; }
+        pre.report { background: #fafafa; border: 1px solid #eee; border-radius: 6px; padding: 16px; font-size: 13px; overflow-x: auto; line-height: 1.7; }
+        .search-box { display: flex; gap: 8px; margin-bottom: 16px; }
+        .search-box input { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .search-box button { background: #c62828; color: #fff; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .search-box button:hover { background: #b71c1c; }
+        img.full { max-width: 100%; border-radius: 6px; margin-top: 8px; }
+        .stats-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+        .stat-total { background: #c62828; color: #fff; font-size: 13px; padding: 6px 14px; border-radius: 20px; font-weight: bold; }
+        .stat-chip { background: #fff; color: #555; font-size: 13px; padding: 6px 14px; border-radius: 20px; border: 1px solid #e0e0e0; }
+        .stat-chip:hover { border-color: #c62828; color: #c62828; }
+        .stat-chip.active { background: #c62828; color: #fff; border-color: #c62828; }
+        .news-item .summary { font-size: 13px; color: #777; margin-top: 4px; line-height: 1.6; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 16px; padding: 16px 0 4px; font-size: 14px; color: #666; }
+        .pagination a { background: #fdecea; color: #c62828; padding: 6px 16px; border-radius: 4px; }
+        .pagination a:hover { background: #c62828; color: #fff; }
+        .btn-danger { background: #fff; color: #c62828; border: 1px solid #c62828; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .btn-danger:hover { background: #c62828; color: #fff; }
+        .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+        #crawl-status { color: #ffd7d7; font-size: 12px; max-width: 260px; }
+        .crawl-btn { background: #fff; color: #c62828; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+        .crawl-btn:hover { background: #ffe0e0; }
+        .crawl-btn:disabled { opacity: .55; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a class="brand" href="/">📰 新闻推荐系统</a>
+        <nav>
+            <a href="/" class="{{ 'active' if active is none else '' }}">最新</a>
+            {% for c in categories %}
+            <a href="/category/{{ c }}" class="{{ 'active' if active == c else '' }}">{{ c }}</a>
+            {% endfor %}
+            <a href="/recommend">🎯 我的推荐</a>
+            <a href="/evaluate">📊 模型评估</a>
+        </nav>
+        <div class="nav-right">
+            <span id="crawl-status"></span>
+            <form action="/crawl" method="post" style="margin:0;">
+                <button type="submit" id="crawl-btn" class="crawl-btn">🔄 立即抓取</button>
+            </form>
+        </div>
+    </div>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    <script>
+        async function updateCrawlStatus() {
+            try {
+                const r = await fetch('/crawl_status');
+                const data = await r.json();
+                const el = document.getElementById('crawl-status');
+                const btn = document.getElementById('crawl-btn');
+                if (data.running) {
+                    el.textContent = '⏳ 正在抓取新闻…';
+                    btn.disabled = true;
+                } else {
+                    btn.disabled = false;
+                    if (data.last_result) {
+                        if (data.last_result.error) {
+                            el.textContent = '上次抓取失败：' + data.last_result.error;
+                        } else {
+                            el.textContent = '上次更新 ' + data.last_result.time + ' 新增 ' + data.last_result.added + ' 条';
+                        }
+                    }
+                }
+            } catch (e) { /* 忽略网络错误 */ }
+        }
+        updateCrawlStatus();
+        setInterval(updateCrawlStatus, 5000);
+    </script>
+</body>
+</html>

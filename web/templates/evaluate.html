@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}模型评估 - 新闻推荐系统{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="page-title">📊 分类模型评估报告</div>
+    {% if report %}
+        <pre class="report">{{ report }}</pre>
+    {% else %}
+        <div class="empty">
+            还没有评估报告。请先运行训练：<br>
+            <code>python -m models.train --plot</code>
+        </div>
+    {% endif %}
+</div>
+
+{% if has_img %}
+<div class="card">
+    <div class="page-title">混淆矩阵</div>
+    <img class="full" src="/static/confusion_matrix.png" alt="混淆矩阵">
+</div>
+{% endif %}
+{% endblock %}
